@@ -4,16 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Просмотр рецепта</title>
+
+    <!--
+    =========================================================================
+    RECIPE.HTML — Страница детального просмотра рецепта
+
+    Назначение:
+        Отображает полную информацию о выбранном рецепте:
+        • Название, описание и фото
+        • Список ингредиентов
+        • Пошаговую инструкцию приготовления
+        • Кнопки редактирования и удаления рецепта
+
+    Технологии:
+        - Чистый HTML + CSS
+        - Vanilla JavaScript
+        - Fetch API для взаимодействия с backend
+
+    Параметры URL:
+        ?id=123   — обязательный параметр (ID рецепта)
+
+    Связанные файлы:
+        - index.html → возвращение к списку рецептов
+        - add-recipe.html - создание нового рецепта
+
+    API-эндпоинты, которые используются:
+        GET    /recipe/{id}           → получение рецепта
+        GET    /{recipeId}/ingredient → получение ингредиентов
+        GET    /{recipeId}/step       → получение шагов приготовления
+        DELETE /recipe/{id}           → удаление рецепта
+
+    Важно:
+        Эта страница является vanilla JS версией.
+        Основная разработка рекомендуется вести в Kotlin/JS + Compose for Web.
+    =========================================================================
+    -->
+
     <style>
         body {
             padding: 20px;
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
         }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
         h2 {
             color: #34495e;
             margin-top: 30px;
@@ -41,23 +74,11 @@
             color: white;
             margin-bottom: 20px;
         }
-        .back-btn:hover {
-            background-color: #95a5a6;
-        }
-        .edit-btn {
-            background-color: #3498db;
-            color: white;
-        }
-        .edit-btn:hover {
-            background-color: #2980b9;
-        }
-        .delete-btn {
-            background-color: #e74c3c;
-            color: white;
-        }
-        .delete-btn:hover {
-            background-color: #c0392b;
-        }
+        .back-btn:hover { background-color: #95a5a6; }
+        .edit-btn { background-color: #3498db; color: white; }
+        .edit-btn:hover { background-color: #2980b9; }
+        .delete-btn { background-color: #e74c3c; color: white; }
+        .delete-btn:hover { background-color: #c0392b; }
         .recipe-description {
             line-height: 1.6;
             margin: 20px 0;
@@ -82,9 +103,7 @@
             border-radius: 5px;
             border-left: 4px solid #3498db;
         }
-        .step-item {
-            border-left-color: #2ecc71;
-        }
+        .step-item { border-left-color: #2ecc71; }
         .loading {
             color: #7f8c8d;
             font-style: italic;
@@ -109,7 +128,10 @@
     </style>
 </head>
 <body>
-<button class="back-btn" onclick="window.location.href='index.html'">← Назад к списку рецептов</button>
+
+<button class="back-btn" onclick="window.location.href='index.html'">
+    ← Назад к списку рецептов
+</button>
 
 <div id="recipeContainer">
     <div class="loading" id="loadingMessage">
@@ -119,10 +141,22 @@
 </div>
 
 <script>
-    // =============== ФУНКЦИИ API ===============
+    /**
+     * Базовый URL API backend'а кулинарной книги
+     * @type {string}
+     */
     const API_BASE_URL = 'http://localhost:8080/api/kulinare';
 
-    // Универсальная функция для запросов
+    // ====================== API ======================
+
+    /**
+     * Универсальная функция для выполнения HTTP-запросов
+     *
+     * @param {string} endpoint - относительный путь или полный URL
+     * @param {string} [method='GET'] - HTTP-метод
+     * @param {Object|null} [data=null] - данные для POST/PUT
+     * @returns {Promise<Object|string>}
+     */
     async function apiRequest(endpoint, method = 'GET', data = null) {
         const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
 
@@ -139,7 +173,7 @@
         }
 
         try {
-            console.log('Отправка запроса:', method, url);
+            console.log(`[API] ${method} ${url}`);
             const response = await fetch(url, options);
 
             if (!response.ok) {
@@ -147,35 +181,34 @@
                 throw new Error(`HTTP ${response.status}: ${errorText}`);
             }
 
-            // Для DELETE запросов может не быть тела
             if (method === 'DELETE') {
                 return response.text();
             }
 
             return await response.json();
         } catch (error) {
-            console.error('API Error:', error);
+            console.error('[API Error]', error);
             throw error;
         }
     }
 
-    // Объект с функциями API
+    /**
+     * Объект с методами API для удобного использования
+     */
     const api = {
-        // Рецепты
-        createRecipe: (recipeData) => apiRequest('/recipe', 'POST', recipeData),
-        getRecipe: (id) => apiRequest(`/recipe/${id}`, 'GET'),
-        updateRecipe: (id, recipeData) => apiRequest(`/recipe/${id}`, 'PUT', recipeData),
-        deleteRecipe: (id) => apiRequest(`/recipe/${id}`, 'DELETE'),
-
-        // Ингредиенты
+        getRecipe:      (id) => apiRequest(`/recipe/${id}`, 'GET'),
+        deleteRecipe:   (id) => apiRequest(`/recipe/${id}`, 'DELETE'),
         getIngredients: (recipeId) => apiRequest(`/${recipeId}/ingredient`, 'GET'),
-
-        // Шаги
-        getSteps: (recipeId) => apiRequest(`/${recipeId}/step`, 'GET')
+        getSteps:       (recipeId) => apiRequest(`/${recipeId}/step`, 'GET')
+        // createRecipe и updateRecipe пока не используются на этой странице
     };
 
-    // =============== ОСНОВНОЙ КОД ===============
-    // Получаем ID рецепта из URL
+    // ====================== ОСНОВНАЯ ЛОГИКА ======================
+
+    /**
+     * ID текущего рецепта, полученный из параметров URL (?id=...)
+     * @type {string|null}
+     */
     const urlParams = new URLSearchParams(window.location.search);
     const recipeId = urlParams.get('id');
 
@@ -184,78 +217,74 @@
             '<div class="error">Ошибка: ID рецепта не указан в URL</div>';
     }
 
-    // Загрузка рецепта
+    /**
+     * Основная функция загрузки и отображения рецепта.
+     * Выполняется автоматически при загрузке страницы.
+     */
     async function loadRecipe() {
         const loadingMessage = document.getElementById('loadingMessage');
         const recipeContent = document.getElementById('recipeContent');
 
         try {
-            // Загружаем рецепт
             const recipe = await api.getRecipe(recipeId);
 
-            // Загружаем ингредиенты
+            // Загружаем дополнительные данные (необязательно)
             let ingredients = [];
-            try {
-                ingredients = await api.getIngredients(recipeId);
-            } catch (ingError) {
-                console.log('Не удалось загрузить ингредиенты:', ingError);
-            }
-
-            // Загружаем шаги
             let steps = [];
-            try {
-                steps = await api.getSteps(recipeId);
-            } catch (stepError) {
-                console.log('Не удалось загрузить шаги:', stepError);
-            }
 
-            // Отображаем рецепт
+            try { ingredients = await api.getIngredients(recipeId); } catch (e) { console.warn('Ингредиенты не загружены', e); }
+            try { steps = await api.getSteps(recipeId); } catch (e) { console.warn('Шаги не загружены', e); }
+
             displayRecipe(recipe, ingredients, steps);
 
-            // Показываем контент, скрываем загрузку
+            // Переключаем видимость
             loadingMessage.style.display = 'none';
             recipeContent.style.display = 'block';
 
         } catch (error) {
-            console.error('Ошибка загрузки:', error);
+            console.error('Ошибка загрузки рецепта:', error);
             loadingMessage.innerHTML = `
-                <div class="error">
-                    ❌ Ошибка загрузки рецепта: ${error.message}<br><br>
-                    <button onclick="window.location.href='index.html'">Вернуться к списку рецептов</button>
-                </div>
-            `;
+                    <div class="error">
+                        ❌ Ошибка загрузки рецепта: ${error.message}<br><br>
+                        <button onclick="window.location.href='index.html'">Вернуться к списку рецептов</button>
+                    </div>
+                `;
         }
     }
 
+    /**
+     * Формирует и вставляет HTML с данными рецепта
+     *
+     * @param {Object} recipe - основной объект рецепта
+     * @param {Array} ingredients - список ингредиентов
+     * @param {Array} steps - список шагов приготовления
+     */
     function displayRecipe(recipe, ingredients, steps) {
         const recipeContent = document.getElementById('recipeContent');
 
         let html = `
-            <h1>${recipe.title || 'Без названия'}</h1>
+                <h1>${recipe.title || 'Без названия'}</h1>
+                ${recipe.photoUrl ?
+            `<img src="${recipe.photoUrl}" alt="${recipe.title}" class="recipe-image" onerror="this.style.display='none'">` : ''}
 
-            ${recipe.photoUrl ?
-                `<img src="${recipe.photoUrl}" alt="${recipe.title}" class="recipe-image" onerror="this.style.display='none'">`
-                : ''
-            }
+                <div class="recipe-description">
+                    ${recipe.description || 'Описание отсутствует'}
+                </div>
 
-            <div class="recipe-description">
-                ${recipe.description || 'Описание отсутствует'}
-            </div>
-
-            <div style="margin: 25px 0; padding: 20px; background: #f8f9fa; border-radius: 5px; text-align: center;">
-                <button class="edit-btn" onclick="editRecipe(${recipe.idRecipe})">✏️ Редактировать</button>
-                <button class="delete-btn" onclick="deleteRecipe(${recipe.idRecipe})">🗑️ Удалить рецепт</button>
-            </div>
-        `;
+                <div style="margin: 25px 0; padding: 20px; background: #f8f9fa; border-radius: 5px; text-align: center;">
+                    <button class="edit-btn" onclick="editRecipe(${recipe.idRecipe || recipe.id})">✏️ Редактировать</button>
+                    <button class="delete-btn" onclick="deleteRecipe(${recipe.idRecipe || recipe.id})">🗑️ Удалить рецепт</button>
+                </div>
+            `;
 
         // Ингредиенты
         html += `<h2>📋 Ингредиенты</h2>`;
         if (ingredients && ingredients.length > 0) {
             ingredients.forEach(item => {
-                if (Array.isArray(item) && item.length >= 3) {
-                    html += `<div class="ingredient-item">${item[2]}: ${item[0]} ${item[1]}</div>`;
-                } else if (typeof item === 'object') {
-                    html += `<div class="ingredient-item">${item.name || ''}: ${item.quantity || ''} ${item.unit || ''}</div>`;
+                if (typeof item === 'object') {
+                    html += `<div class="ingredient-item">
+                            ${item.name || ''}: ${item.quantity || ''} ${item.unit || ''}
+                        </div>`;
                 }
             });
         } else {
@@ -265,16 +294,13 @@
         // Шаги приготовления
         html += `<h2>👨‍🍳 Шаги приготовления</h2>`;
         if (steps && steps.length > 0) {
-            // Сортируем шаги по порядку
-            steps.sort((a, b) => (a.stepOrder || 0) - (b.stepOrder || 0));
-
+            steps.sort((a, b) => (a.stepOrder || a.stepNumber || 0) - (b.stepOrder || b.stepNumber || 0));
             steps.forEach((step, index) => {
                 html += `
-                    <div class="step-item">
-                        <strong>Шаг ${step.stepOrder || index + 1}:</strong>
-                        ${step.stepDescription || step.description || step}
-                    </div>
-                `;
+                        <div class="step-item">
+                            <strong>Шаг ${step.stepOrder || step.stepNumber || index + 1}:</strong>
+                            ${step.stepDescription || step.description || step}
+                        </div>`;
             });
         } else {
             html += `<div class="no-data">Шаги приготовления не указаны</div>`;
@@ -283,31 +309,39 @@
         recipeContent.innerHTML = html;
     }
 
+    /**
+     * Заглушка функции редактирования рецепта
+     * @param {number} id - ID рецепта
+     */
     function editRecipe(id) {
-        // Простая реализация редактирования
         const newTitle = prompt('Введите новое название рецепта:');
         if (newTitle) {
-            alert('Функция редактирования в разработке. В реальном приложении здесь бы сохранялись изменения.');
+            alert('Функция полного редактирования пока в разработке.');
         }
     }
 
+    /**
+     * Удаляет рецепт после подтверждения пользователя
+     * @param {number} id - ID рецепта
+     */
     async function deleteRecipe(id) {
-        if (!confirm('Вы уверены, что хотите удалить этот рецепт? Это действие нельзя отменить.')) {
+        if (!confirm('Вы уверены, что хотите удалить этот рецепт?\nЭто действие нельзя отменить.')) {
             return;
         }
 
         try {
             await api.deleteRecipe(id);
-            alert('Рецепт успешно удален!');
+            alert('Рецепт успешно удалён!');
             window.location.href = 'index.html';
         } catch (error) {
             console.error('Ошибка удаления:', error);
-            alert('Ошибка при удалении рецепта: ' + error.message);
+            alert('Не удалось удалить рецепт: ' + error.message);
         }
     }
 
-    // Загружаем рецепт при загрузке страницы
+    // Автозагрузка рецепта при открытии страницы
     window.onload = loadRecipe;
+
 </script>
 </body>
 </html>
