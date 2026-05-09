@@ -5,83 +5,406 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кулинарная книга</title>
     <style>
-        body { padding: 20px; font-family: Arial, sans-serif; background-color: #f8f9fa; margin: 0; }
-        h1 { color: #2c3e50; margin-bottom: 20px; text-align: center; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .controls { text-align: center; margin-bottom: 20px; }
-        button { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin: 0 8px; }
-        button:hover { background: #2980b9; }
-        .recipe-item {
-            background: white; padding: 18px; margin: 12px 0; border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #3498db;
+        :root {
+            --bg: #fff7ed;
+            --card: #ffffff;
+            --text: #2d1b10;
+            --muted: #7c6f64;
+            --accent: #f97316;
+            --accent-dark: #ea580c;
+            --accent-soft: #ffedd5;
+            --danger: #dc2626;
+            --shadow: 0 18px 45px rgba(124, 45, 18, 0.12);
+            --radius: 22px;
         }
-        .recipe-title { font-size: 20px; font-weight: bold; color: #2c3e50; margin-bottom: 8px; }
-        .recipe-description { color: #555; line-height: 1.5; }
-        .no-recipes { text-align: center; color: #7f8c8d; font-style: italic; padding: 40px; }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, #fed7aa 0, transparent 34%),
+                linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%);
+        }
+
+        .page {
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 32px 0 48px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 24px;
+            align-items: stretch;
+            margin-bottom: 24px;
+        }
+
+        .hero-card, .panel {
+            background: rgba(255, 255, 255, 0.86);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(249, 115, 22, 0.16);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .hero-card { padding: 34px; }
+        .panel { padding: 24px; margin-top: 22px; }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: #9a3412;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        h1 {
+            margin: 16px 0 10px;
+            font-size: clamp(34px, 6vw, 58px);
+            line-height: 1;
+            letter-spacing: -1.5px;
+        }
+
+        .subtitle {
+            max-width: 680px;
+            color: var(--muted);
+            font-size: 18px;
+            line-height: 1.6;
+            margin: 0 0 24px;
+        }
+
+        .hero-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 26px;
+            background: linear-gradient(160deg, #fb923c, #f97316);
+            color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero-side::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            right: -60px;
+            bottom: -60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+        }
+
+        .hero-side strong { font-size: 52px; line-height: 1; }
+        .hero-side span { max-width: 220px; line-height: 1.5; opacity: 0.95; }
+
+        .actions, .search-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button, .link-button {
+            border: none;
+            border-radius: 14px;
+            padding: 12px 18px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s ease;
+        }
+
+        .primary { background: var(--accent); color: white; }
+        .primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
+        .secondary { background: white; color: var(--text); border: 1px solid #fed7aa; }
+        .secondary:hover { background: #fff7ed; transform: translateY(-1px); }
+
+        input {
+            width: 100%;
+            border: 1px solid #fed7aa;
+            border-radius: 14px;
+            padding: 14px 16px;
+            background: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.13);
+        }
+
+        .search-row input { flex: 1 1 280px; }
+
+        .section-title {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .section-title h2 { margin: 0; font-size: 26px; }
+        .hint { color: var(--muted); font-size: 14px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .recipe-card, .internet-card {
+            background: var(--card);
+            border: 1px solid rgba(249, 115, 22, 0.16);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(124, 45, 18, 0.08);
+        }
+
+        .recipe-card { padding: 18px; }
+        .recipe-card h3, .internet-card h3 { margin: 0 0 8px; font-size: 20px; }
+        .recipe-card p, .internet-card p { color: var(--muted); line-height: 1.5; margin: 0 0 16px; }
+
+        .thumb {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            background: #ffedd5;
+            display: block;
+        }
+
+        .internet-body { padding: 18px; }
+        .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .tag { font-size: 13px; background: #f3f4f6; color: #4b5563; padding: 6px 9px; border-radius: 999px; }
+        .empty, .error, .loading { text-align: center; padding: 34px; color: var(--muted); }
+        .error { color: var(--danger); background: #fee2e2; border-radius: 16px; }
+
+        @media (max-width: 760px) {
+            .hero { grid-template-columns: 1fr; }
+            .hero-card { padding: 24px; }
+            .hero-side strong { font-size: 40px; }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Кулинарная книга</h1>
-    <div class="controls">
-        <button onclick="addRecipe()">Добавить рецепт</button>
-        <button onclick="loadRecipes()">Обновить список</button>
-    </div>
+<div class="page">
+    <section class="hero">
+        <div class="hero-card">
+            <div class="badge">Домашняя база рецептов</div>
+            <h1>Кулинарная книга</h1>
+            <p class="subtitle">Сохраняй свои рецепты, открывай карточки блюд и ищи идеи в интернете через подключенный API.</p>
+            <div class="actions">
+                <a class="link-button primary" href="add-recipe.html">Добавить рецепт</a>
+                <button class="secondary" onclick="loadRecipes()">Обновить список</button>
+            </div>
+        </div>
+        <div class="hero-side">
+            <span>Всего рецептов в твоей базе</span>
+            <strong id="recipeCount">0</strong>
+        </div>
+    </section>
 
-    <div id="recipeList">
-        <p class="no-recipes">Загрузка рецептов...</p>
-    </div>
+    <section class="panel">
+        <div class="section-title">
+            <div>
+                <h2>Поиск рецепта в интернете</h2>
+                <div class="hint">Ищи на английском: chicken, pasta, cake, soup</div>
+            </div>
+        </div>
+        <div class="search-row">
+            <input id="internetQuery" type="text" placeholder="Например: chicken" onkeydown="if(event.key === 'Enter') searchInternetRecipes()">
+            <button class="primary" onclick="searchInternetRecipes()">Найти</button>
+        </div>
+        <div id="internetResults" style="margin-top: 18px;"></div>
+    </section>
+
+    <section class="panel">
+        <div class="section-title">
+            <div>
+                <h2>Мои рецепты</h2>
+                <div class="hint">Рецепты, сохраненные в твоей базе</div>
+            </div>
+        </div>
+        <div id="recipeList" class="grid">
+            <div class="loading">Загрузка рецептов...</div>
+        </div>
+    </section>
 </div>
 
 <script>
     const API = 'http://localhost:8080/api/kulinare';
 
-    async function getRecipes() {
-        const res = await fetch(`${API}/recipes`);
-        if (!res.ok) throw new Error('Не удалось загрузить рецепты');
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function shortText(text, max = 150) {
+        if (!text) return 'Нет описания';
+        const clean = String(text).replace(/\s+/g, ' ').trim();
+        return clean.length > max ? clean.substring(0, max) + '...' : clean;
+    }
+
+    async function apiGet(url) {
+        const res = await fetch(url);
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`Ошибка ${res.status}: ${text}`);
+        }
         return await res.json();
     }
 
     async function loadRecipes() {
         const list = document.getElementById('recipeList');
-        list.innerHTML = '<p>Загрузка...</p>';
+        const count = document.getElementById('recipeCount');
+        list.innerHTML = '<div class="loading">Загрузка...</div>';
 
         try {
-            const recipes = await getRecipes();
+            const recipes = await apiGet(`${API}/recipes`);
+            count.textContent = recipes?.length || 0;
+
             if (!recipes || recipes.length === 0) {
-                list.innerHTML = '<p class="no-recipes">Рецептов пока нет. Добавьте первый!</p>';
+                list.innerHTML = '<div class="empty">Рецептов пока нет. Добавь первый рецепт.</div>';
                 return;
             }
 
             list.innerHTML = '';
-            recipes.forEach(r => {
-                const div = document.createElement('div');
-                div.className = 'recipe-item';
-                div.innerHTML = `
-                    <div class="recipe-title">${r.title || 'Без названия'}</div>
-                    <div class="recipe-description">
-                        ${r.description ? r.description.substring(0, 150) + '...' : 'Нет описания'}
-                    </div>
-                    <button onclick="viewRecipe(${r.idRecipe})" style="margin-top: 10px; padding: 8px 16px; font-size: 14px;">
-                        Открыть рецепт →
-                    </button>
+            recipes.forEach(recipe => {
+                const card = document.createElement('article');
+                card.className = 'recipe-card';
+                card.innerHTML = `
+                    <h3>${escapeHtml(recipe.title || 'Без названия')}</h3>
+                    <p>${escapeHtml(shortText(recipe.description))}</p>
+                    <button class="primary" onclick="viewRecipe(${Number(recipe.idRecipe)})">Открыть рецепт</button>
                 `;
-                list.appendChild(div);
+                list.appendChild(card);
             });
-        } catch (e) {
-            list.innerHTML = `<p style="color: red; text-align: center;">Ошибка: ${e.message}</p>`;
+        } catch (error) {
+            count.textContent = '0';
+            list.innerHTML = `<div class="error">Не удалось загрузить рецепты: ${escapeHtml(error.message)}</div>`;
         }
     }
 
-    function addRecipe() {
-        window.location.href = 'add-recipe.html';
+    async function searchInternetRecipes() {
+        const queryInput = document.getElementById('internetQuery');
+        const results = document.getElementById('internetResults');
+        const query = queryInput.value.trim();
+
+        if (!query) {
+            results.innerHTML = '<div class="error">Введите название блюда для поиска.</div>';
+            return;
+        }
+
+        results.innerHTML = '<div class="loading">Ищу рецепты в интернете...</div>';
+
+        try {
+            const recipes = await apiGet(`${API}/internet/search?query=${encodeURIComponent(query)}`);
+
+            if (!recipes || recipes.length === 0) {
+                results.innerHTML = '<div class="empty">Ничего не найдено. Попробуй другое название на английском.</div>';
+                return;
+            }
+
+            results.innerHTML = '<div class="grid"></div>';
+            const grid = results.querySelector('.grid');
+
+            recipes.forEach((recipe, index) => {
+                const ingredients = (recipe.ingredients || [])
+                    .slice(0, 6)
+                    .map(i => `${i.name || ''}${i.measure ? ' — ' + i.measure : ''}`)
+                    .join(', ');
+
+                const card = document.createElement('article');
+                card.className = 'internet-card';
+                card.innerHTML = `
+                    ${recipe.photoUrl ? `<img class="thumb" src="${escapeHtml(recipe.photoUrl)}" alt="${escapeHtml(recipe.title)}" onerror="this.style.display='none'">` : ''}
+                    <div class="internet-body">
+                        <div class="meta">
+                            ${recipe.category ? `<span class="tag">${escapeHtml(recipe.category)}</span>` : ''}
+                            ${recipe.area ? `<span class="tag">${escapeHtml(recipe.area)}</span>` : ''}
+                        </div>
+                        <h3>${escapeHtml(recipe.title || 'Без названия')}</h3>
+                        <p>${escapeHtml(shortText(recipe.instructions, 180))}</p>
+                        <p><strong>Ингредиенты:</strong> ${escapeHtml(ingredients || 'не указаны')}</p>
+                        <button class="primary" onclick="openImportedRecipe(${index})">Добавить в мою книгу</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            window.internetRecipesCache = recipes;
+        } catch (error) {
+            results.innerHTML = `<div class="error">Не удалось выполнить поиск: ${escapeHtml(error.message)}</div>`;
+        }
+    }
+
+    function splitInternetSteps(text) {
+        const clean = String(text || '')
+            .replace(/\r/g, '')
+            .replace(/\n+/g, '\n')
+            .trim();
+
+        if (!clean) return [];
+
+        const byLines = clean
+            .split('\n')
+            .map(s => s.trim())
+            .filter(Boolean);
+
+        const parts = byLines.length > 1
+            ? byLines
+            : clean.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(s => s.length > 10);
+
+        return parts.slice(0, 20).map((stepDescription, index) => ({
+            stepOrder: index + 1,
+            stepDescription
+        }));
+    }
+
+    function openImportedRecipe(index) {
+        const recipe = window.internetRecipesCache?.[index];
+        if (!recipe) return;
+
+        const steps = splitInternetSteps(recipe.instructions || '');
+
+        localStorage.setItem('importedRecipe', JSON.stringify({
+            title: recipe.title || '',
+            description: recipe.category || recipe.area
+                ? `${recipe.category || ''}${recipe.category && recipe.area ? ', ' : ''}${recipe.area || ''}`
+                : 'Рецепт найден в интернете',
+            instructions: recipe.instructions || '',
+            photoUrl: recipe.photoUrl || '',
+            youtubeUrl: recipe.youtubeUrl || '',
+            ingredients: recipe.ingredients || [],
+            steps
+        }));
+
+        window.location.href = 'add-recipe.html?from=internet';
     }
 
     function viewRecipe(id) {
         window.location.href = `recipe.html?id=${id}`;
     }
 
-    // Автозагрузка при открытии
     window.onload = loadRecipes;
 </script>
 </body>
