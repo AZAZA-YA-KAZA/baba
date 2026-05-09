@@ -5,122 +5,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Просмотр рецепта</title>
     <style>
-        :root {
-            --bg: #fff7ed;
-            --card: #ffffff;
-            --text: #2d1b10;
-            --muted: #7c6f64;
-            --accent: #f97316;
-            --accent-dark: #ea580c;
-            --accent-soft: #ffedd5;
-            --green: #16a34a;
-            --danger: #dc2626;
-            --shadow: 0 18px 45px rgba(124, 45, 18, 0.12);
-            --radius: 22px;
-        }
-
-        * { box-sizing: border-box; }
-
         body {
-            margin: 0;
-            min-height: 100vh;
+            padding: 20px;
             font-family: Arial, sans-serif;
-            color: var(--text);
-            background:
-                radial-gradient(circle at top left, #fed7aa 0, transparent 34%),
-                linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%);
+            background-color: #f8f9fa;
         }
-
-        .page {
-            width: min(920px, calc(100% - 32px));
-            margin: 0 auto;
-            padding: 32px 0 48px;
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
         }
-
-        .top-link {
-            color: #9a3412;
-            text-decoration: none;
-            font-weight: 700;
-            display: inline-flex;
-            margin-bottom: 18px;
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
         }
-
-        .card {
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid rgba(249, 115, 22, 0.16);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        .content { padding: 28px; }
-        .recipe-image { width: 100%; max-height: 420px; object-fit: cover; background: #ffedd5; display: block; }
-        h1 { margin: 0 0 12px; font-size: clamp(32px, 5vw, 48px); letter-spacing: -1px; }
-        h2 { margin: 28px 0 14px; font-size: 24px; }
-        .description { color: #3f332a; line-height: 1.7; white-space: pre-wrap; background: #fff7ed; border-radius: 18px; padding: 18px; border: 1px solid #fed7aa; }
-
-        .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
-
-        button, .button-link {
-            border: none;
-            border-radius: 14px;
-            padding: 12px 18px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s ease;
-        }
-
-        .primary { background: var(--accent); color: white; }
-        .primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
-        .secondary { background: white; color: var(--text); border: 1px solid #fed7aa; }
-        .secondary:hover { background: #fff7ed; transform: translateY(-1px); }
-        .danger { background: var(--danger); color: white; }
-        .danger:hover { background: #b91c1c; transform: translateY(-1px); }
-
-        .list { display: grid; gap: 10px; }
-        .item {
+        #recipeContainer {
             background: white;
-            border: 1px solid #fed7aa;
-            border-left: 5px solid var(--accent);
-            border-radius: 14px;
-            padding: 14px 16px;
-            line-height: 1.5;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
         }
-        .step { border-left-color: var(--green); }
-        .empty, .loading, .error { text-align: center; padding: 34px; color: var(--muted); }
-        .error { color: var(--danger); background: #fee2e2; border-radius: 16px; margin: 24px; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .back-btn {
+            background-color: #7f8c8d;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            background-color: #95a5a6;
+        }
+        .edit-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        .edit-btn:hover {
+            background-color: #2980b9;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        .recipe-description {
+            line-height: 1.6;
+            margin: 20px 0;
+            color: #444;
+            font-size: 16px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .recipe-image {
+            max-width: 100%;
+            height: auto;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .ingredient-item, .step-item {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .step-item {
+            border-left-color: #2ecc71;
+        }
+        .loading {
+            color: #7f8c8d;
+            font-style: italic;
+            text-align: center;
+            padding: 30px;
+        }
+        .error {
+            color: #e74c3c;
+            padding: 20px;
+            background: #fdeaea;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .no-data {
+            color: #95a5a6;
+            font-style: italic;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-<div class="page">
-    <a class="top-link" href="index.html">Назад к списку</a>
+<button class="back-btn" onclick="window.location.href='index.html'">← Назад к списку рецептов</button>
 
-    <main id="recipeContainer" class="card">
-        <div id="loadingMessage" class="loading">Загрузка рецепта...</div>
-        <div id="recipeContent" style="display: none;"></div>
-    </main>
+<div id="recipeContainer">
+    <div class="loading" id="loadingMessage">
+        Загрузка рецепта...
+    </div>
+    <div id="recipeContent" style="display: none;"></div>
 </div>
 
 <script>
+    // =============== ФУНКЦИИ API ===============
     const API_BASE_URL = 'http://localhost:8080/api/kulinare';
 
-    function escapeHtml(value) {
-        return String(value ?? '')
-            .replaceAll('&', '&amp;')
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&#039;');
-    }
-
+    // Универсальная функция для запросов
     async function apiRequest(endpoint, method = 'GET', data = null) {
+        const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+
         const options = {
-            method,
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -131,114 +138,175 @@
             options.body = JSON.stringify(data);
         }
 
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Ошибка ${response.status}: ${errorText}`);
-        }
+        try {
+            console.log('Отправка запроса:', method, url);
+            const response = await fetch(url, options);
 
-        return method === 'DELETE' ? await response.text() : await response.json();
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+
+            // Для DELETE запросов может не быть тела
+            if (method === 'DELETE') {
+                return response.text();
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            throw error;
+        }
     }
 
+    // Объект с функциями API
     const api = {
-        getRecipe: (id) => apiRequest(`/recipe/${id}`),
+        // Рецепты
+        createRecipe: (recipeData) => apiRequest('/recipe', 'POST', recipeData),
+        getRecipe: (id) => apiRequest(`/recipe/${id}`, 'GET'),
+        updateRecipe: (id, recipeData) => apiRequest(`/recipe/${id}`, 'PUT', recipeData),
         deleteRecipe: (id) => apiRequest(`/recipe/${id}`, 'DELETE'),
-        getIngredients: (recipeId) => apiRequest(`/${recipeId}/ingredient`),
-        getSteps: (recipeId) => apiRequest(`/${recipeId}/step`)
+
+        // Ингредиенты
+        getIngredients: (recipeId) => apiRequest(`/${recipeId}/ingredient`, 'GET'),
+
+        // Шаги
+        getSteps: (recipeId) => apiRequest(`/${recipeId}/step`, 'GET')
     };
 
-    const recipeId = new URLSearchParams(window.location.search).get('id');
+    // =============== ОСНОВНОЙ КОД ===============
+    // Получаем ID рецепта из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const recipeId = urlParams.get('id');
 
+    if (!recipeId) {
+        document.getElementById('loadingMessage').innerHTML =
+            '<div class="error">Ошибка: ID рецепта не указан в URL</div>';
+    }
+
+    // Загрузка рецепта
     async function loadRecipe() {
         const loadingMessage = document.getElementById('loadingMessage');
         const recipeContent = document.getElementById('recipeContent');
 
-        if (!recipeId) {
-            loadingMessage.innerHTML = '<div class="error">ID рецепта не указан в адресной строке.</div>';
+        try {
+            // Загружаем рецепт
+            const recipe = await api.getRecipe(recipeId);
+
+            // Загружаем ингредиенты
+            let ingredients = [];
+            try {
+                ingredients = await api.getIngredients(recipeId);
+            } catch (ingError) {
+                console.log('Не удалось загрузить ингредиенты:', ingError);
+            }
+
+            // Загружаем шаги
+            let steps = [];
+            try {
+                steps = await api.getSteps(recipeId);
+            } catch (stepError) {
+                console.log('Не удалось загрузить шаги:', stepError);
+            }
+
+            // Отображаем рецепт
+            displayRecipe(recipe, ingredients, steps);
+
+            // Показываем контент, скрываем загрузку
+            loadingMessage.style.display = 'none';
+            recipeContent.style.display = 'block';
+
+        } catch (error) {
+            console.error('Ошибка загрузки:', error);
+            loadingMessage.innerHTML = `
+                <div class="error">
+                    ❌ Ошибка загрузки рецепта: ${error.message}<br><br>
+                    <button onclick="window.location.href='index.html'">Вернуться к списку рецептов</button>
+                </div>
+            `;
+        }
+    }
+
+    function displayRecipe(recipe, ingredients, steps) {
+        const recipeContent = document.getElementById('recipeContent');
+
+        let html = `
+            <h1>${recipe.title || 'Без названия'}</h1>
+
+            ${recipe.photoUrl ?
+                `<img src="${recipe.photoUrl}" alt="${recipe.title}" class="recipe-image" onerror="this.style.display='none'">`
+                : ''
+            }
+
+            <div class="recipe-description">
+                ${recipe.description || 'Описание отсутствует'}
+            </div>
+
+            <div style="margin: 25px 0; padding: 20px; background: #f8f9fa; border-radius: 5px; text-align: center;">
+                <button class="edit-btn" onclick="editRecipe(${recipe.idRecipe})">✏️ Редактировать</button>
+                <button class="delete-btn" onclick="deleteRecipe(${recipe.idRecipe})">🗑️ Удалить рецепт</button>
+            </div>
+        `;
+
+        // Ингредиенты
+        html += `<h2>📋 Ингредиенты</h2>`;
+        if (ingredients && ingredients.length > 0) {
+            ingredients.forEach(item => {
+                if (Array.isArray(item) && item.length >= 3) {
+                    html += `<div class="ingredient-item">${item[2]}: ${item[0]} ${item[1]}</div>`;
+                } else if (typeof item === 'object') {
+                    html += `<div class="ingredient-item">${item.name || ''}: ${item.quantity || ''} ${item.unit || ''}</div>`;
+                }
+            });
+        } else {
+            html += `<div class="no-data">Ингредиенты не указаны</div>`;
+        }
+
+        // Шаги приготовления
+        html += `<h2>👨‍🍳 Шаги приготовления</h2>`;
+        if (steps && steps.length > 0) {
+            // Сортируем шаги по порядку
+            steps.sort((a, b) => (a.stepOrder || 0) - (b.stepOrder || 0));
+
+            steps.forEach((step, index) => {
+                html += `
+                    <div class="step-item">
+                        <strong>Шаг ${step.stepOrder || index + 1}:</strong>
+                        ${step.stepDescription || step.description || step}
+                    </div>
+                `;
+            });
+        } else {
+            html += `<div class="no-data">Шаги приготовления не указаны</div>`;
+        }
+
+        recipeContent.innerHTML = html;
+    }
+
+    function editRecipe(id) {
+        // Простая реализация редактирования
+        const newTitle = prompt('Введите новое название рецепта:');
+        if (newTitle) {
+            alert('Функция редактирования в разработке. В реальном приложении здесь бы сохранялись изменения.');
+        }
+    }
+
+    async function deleteRecipe(id) {
+        if (!confirm('Вы уверены, что хотите удалить этот рецепт? Это действие нельзя отменить.')) {
             return;
         }
 
         try {
-            const recipe = await api.getRecipe(recipeId);
-
-            let ingredients = [];
-            let steps = [];
-
-            try { ingredients = await api.getIngredients(recipeId); } catch (error) { console.log(error); }
-            try { steps = await api.getSteps(recipeId); } catch (error) { console.log(error); }
-
-            recipeContent.innerHTML = renderRecipe(recipe, ingredients, steps);
-            loadingMessage.style.display = 'none';
-            recipeContent.style.display = 'block';
-        } catch (error) {
-            loadingMessage.innerHTML = `<div class="error">Не удалось загрузить рецепт: ${escapeHtml(error.message)}</div>`;
-        }
-    }
-
-    function renderRecipe(recipe, ingredients, steps) {
-        const photo = recipe.photoUrl
-            ? `<img src="${escapeHtml(recipe.photoUrl)}" alt="${escapeHtml(recipe.title)}" class="recipe-image" onerror="this.style.display='none'">`
-            : '';
-
-        return `
-            ${photo}
-            <div class="content">
-                <h1>${escapeHtml(recipe.title || 'Без названия')}</h1>
-                <div class="description">${escapeHtml(recipe.description || 'Описание отсутствует')}</div>
-
-                <div class="actions">
-                    <button class="danger" onclick="deleteRecipe(${Number(recipe.idRecipe)})">Удалить рецепт</button>
-                    <a class="button-link secondary" href="index.html">К списку рецептов</a>
-                </div>
-
-                <h2>Ингредиенты</h2>
-                <div class="list">${renderIngredients(ingredients)}</div>
-
-                <h2>Шаги приготовления</h2>
-                <div class="list">${renderSteps(steps)}</div>
-            </div>
-        `;
-    }
-
-    function renderIngredients(ingredients) {
-        if (!ingredients || ingredients.length === 0) {
-            return '<div class="empty">Ингредиенты не указаны.</div>';
-        }
-
-        return ingredients.map(item => {
-            if (Array.isArray(item) && item.length >= 3) {
-                return `<div class="item">${escapeHtml(item[2])}: ${escapeHtml(item[0])} ${escapeHtml(item[1])}</div>`;
-            }
-            return `<div class="item">${escapeHtml(item.name || '')}: ${escapeHtml(item.quantity || item.count || '')} ${escapeHtml(item.unit || '')}</div>`;
-        }).join('');
-    }
-
-    function renderSteps(steps) {
-        if (!steps || steps.length === 0) {
-            return '<div class="empty">Шаги приготовления не указаны.</div>';
-        }
-
-        return steps
-            .sort((a, b) => (a.stepOrder || 0) - (b.stepOrder || 0))
-            .map((step, index) => `
-                <div class="item step">
-                    <strong>Шаг ${escapeHtml(step.stepOrder || index + 1)}.</strong>
-                    ${escapeHtml(step.stepDescription || step.description || step)}
-                </div>
-            `).join('');
-    }
-
-    async function deleteRecipe(id) {
-        if (!confirm('Удалить этот рецепт?')) return;
-
-        try {
             await api.deleteRecipe(id);
+            alert('Рецепт успешно удален!');
             window.location.href = 'index.html';
         } catch (error) {
-            alert(`Не удалось удалить рецепт: ${error.message}`);
+            console.error('Ошибка удаления:', error);
+            alert('Ошибка при удалении рецепта: ' + error.message);
         }
     }
 
+    // Загружаем рецепт при загрузке страницы
     window.onload = loadRecipe;
 </script>
 </body>

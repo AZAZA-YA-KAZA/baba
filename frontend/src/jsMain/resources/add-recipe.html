@@ -5,540 +5,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добавить рецепт</title>
     <style>
-        :root {
-            --bg: #fff7ed;
-            --card: #ffffff;
-            --text: #2d1b10;
-            --muted: #7c6f64;
-            --accent: #f97316;
-            --accent-dark: #ea580c;
-            --accent-soft: #ffedd5;
-            --line: #fed7aa;
-            --success: #15803d;
-            --danger: #dc2626;
-            --shadow: 0 18px 45px rgba(124, 45, 18, 0.12);
-            --radius: 22px;
+        body { padding: 20px; font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; }
+        .form-container {
+            max-width: 600px; margin: 40px auto; background: white;
+            padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: Arial, sans-serif;
-            color: var(--text);
-            background:
-                radial-gradient(circle at top left, #fed7aa 0, transparent 34%),
-                linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%);
-        }
-
-        .page {
-            width: min(980px, calc(100% - 32px));
-            margin: 0 auto;
-            padding: 32px 0 48px;
-        }
-
-        .top-link {
-            color: #9a3412;
-            text-decoration: none;
-            font-weight: 700;
-            display: inline-flex;
-            margin-bottom: 18px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid rgba(249, 115, 22, 0.16);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 30px;
-        }
-
-        h1 { margin: 0 0 8px; font-size: 36px; letter-spacing: -0.8px; }
-        h2 { margin: 30px 0 8px; font-size: 22px; }
-        .subtitle { color: var(--muted); margin: 0 0 24px; line-height: 1.5; }
-
-        .section {
-            margin-top: 22px;
-            padding: 20px;
-            border: 1px solid var(--line);
-            background: #fffaf5;
-            border-radius: 18px;
-        }
-
-        .section-head {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            align-items: center;
-            margin-bottom: 14px;
-        }
-
-        .section-head h2 { margin: 0; }
-
-        label {
-            display: block;
-            margin: 14px 0 8px;
-            font-weight: 700;
-        }
-
+        h1 { text-align: center; color: #2c3e50; }
         input, textarea {
-            width: 100%;
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            padding: 13px 15px;
-            background: white;
-            font-size: 15px;
-            outline: none;
+            width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 16px; box-sizing: border-box;
         }
-
-        textarea { min-height: 120px; resize: vertical; line-height: 1.55; }
-
-        input:focus, textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.13);
+        textarea { min-height: 120px; resize: vertical; }
+        button {
+            padding: 12px 24px; margin: 10px 8px 0 0; border: none; border-radius: 6px;
+            cursor: pointer; font-size: 16px;
         }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
+        .save-btn { background: #27ae60; color: white; }
+        .save-btn:hover { background: #219a52; }
+        .cancel-btn { background: #95a5a6; color: white; }
+        .cancel-btn:hover { background: #7f8c8d; }
+        .success, .error-msg {
+            padding: 15px; margin: 20px 0; border-radius: 8px; text-align: center; font-weight: bold;
         }
-
-        .ingredient-row {
-            display: grid;
-            grid-template-columns: 1fr 120px 130px 44px;
-            gap: 10px;
-            align-items: end;
-            margin-top: 10px;
-        }
-
-        .step-row {
-            display: grid;
-            grid-template-columns: 70px 1fr 44px;
-            gap: 10px;
-            align-items: start;
-            margin-top: 10px;
-        }
-
-        .step-row textarea { min-height: 74px; }
-
-        .actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 22px;
-        }
-
-        button, .button-link {
-            border: none;
-            border-radius: 14px;
-            padding: 12px 18px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s ease;
-        }
-
-        .primary { background: var(--accent); color: white; }
-        .primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
-
-        .secondary { background: white; color: var(--text); border: 1px solid var(--line); }
-        .secondary:hover { background: #fff7ed; transform: translateY(-1px); }
-
-        .danger-small {
-            width: 44px;
-            height: 44px;
-            padding: 0;
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
-        .message {
-            margin-top: 18px;
-            padding: 14px 16px;
-            border-radius: 14px;
-            font-weight: 700;
-        }
-
-        .success { background: #dcfce7; color: var(--success); }
-        .error { background: #fee2e2; color: var(--danger); }
-        .info { background: var(--accent-soft); color: #9a3412; }
-
-        .hint {
-            margin: 6px 0 0;
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.45;
-        }
-
-        @media (max-width: 760px) {
-            .grid-2, .ingredient-row, .step-row {
-                grid-template-columns: 1fr;
-            }
-
-            .danger-small {
-                width: 100%;
-            }
-
-            h1 { font-size: 30px; }
-            .card { padding: 20px; }
-        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error-msg { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
-<div class="page">
-    <a class="top-link" href="index.html">← Назад к списку</a>
+<div class="form-container">
+    <h1>Добавить новый рецепт</h1>
+    <form id="recipeForm">
+        <input type="text" id="title" placeholder="Название рецепта *" required>
+        <textarea id="description" placeholder="Полное описание рецепта (ингредиенты, шаги и т.д.) *" required></textarea>
+        <input type="url" id="photoUrl" placeholder="Ссылка на фото (необязательно)">
 
-    <main class="card">
-        <h1>Добавить рецепт</h1>
-        <p class="subtitle">
-            Теперь рецепт сохраняется нормально: отдельно карточка рецепта, отдельно ингредиенты, отдельно шаги приготовления.
-        </p>
-
-        <form id="recipeForm">
-            <div class="section">
-                <div class="section-head">
-                    <h2>Основная информация</h2>
-                </div>
-
-                <div class="grid-2">
-                    <div>
-                        <label for="title">Название рецепта *</label>
-                        <input type="text" id="title" placeholder="Например: Паста с томатным соусом" required>
-                    </div>
-
-                    <div>
-                        <label for="photoUrl">Ссылка на фото</label>
-                        <input type="url" id="photoUrl" placeholder="https://example.com/photo.jpg">
-                    </div>
-                </div>
-
-                <label for="description">Краткое описание *</label>
-                <textarea id="description" placeholder="Например: простой домашний рецепт пасты с томатным соусом" required></textarea>
-            </div>
-
-            <div class="section">
-                <div class="section-head">
-                    <div>
-                        <h2>Ингредиенты</h2>
-                        <p class="hint">Например: Мука — 300 — г. Количество должно быть числом, потому что в backend поле `count: Int`.</p>
-                    </div>
-                    <button type="button" class="secondary" onclick="addIngredientRow()">+ Ингредиент</button>
-                </div>
-
-                <div id="ingredientsList"></div>
-            </div>
-
-            <div class="section">
-                <div class="section-head">
-                    <div>
-                        <h2>Шаги приготовления</h2>
-                        <p class="hint">Каждый шаг сохранится отдельной записью через `/api/kulinare/{idRecipe}/step`.</p>
-                    </div>
-                    <button type="button" class="secondary" onclick="addStepRow()">+ Шаг</button>
-                </div>
-
-                <div id="stepsList"></div>
-            </div>
-
-            <div class="actions">
-                <button type="submit" class="primary">Сохранить рецепт</button>
-                <a class="button-link secondary" href="index.html">Отмена</a>
-                <button type="button" class="secondary" onclick="clearForm()">Очистить</button>
-            </div>
-        </form>
-
-        <div id="message"></div>
-    </main>
+        <div style="text-align: center; margin-top: 20px;">
+            <button type="submit" class="save-btn">Сохранить рецепт</button>
+            <button type="button" class="cancel-btn" onclick="window.location.href='index.html'">Отмена</button>
+        </div>
+    </form>
+    <div id="message"></div>
 </div>
 
 <script>
     const API = 'http://localhost:8080/api/kulinare';
 
-    function escapeHtml(value) {
-        return String(value ?? '')
-            .replaceAll('&', '&amp;')
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&#039;');
-    }
-
-    function showMessage(text, type = 'info') {
-        document.getElementById('message').innerHTML = `<div class="message ${type}">${escapeHtml(text)}</div>`;
-    }
-
-    function addIngredientRow(data = {}) {
-        const list = document.getElementById('ingredientsList');
-        const row = document.createElement('div');
-        row.className = 'ingredient-row';
-        row.innerHTML = `
-            <div>
-                <label>Название</label>
-                <input class="ingredient-name" type="text" placeholder="Мука" value="${escapeHtml(data.name || '')}">
-            </div>
-            <div>
-                <label>Кол-во</label>
-                <input class="ingredient-count" type="number" min="1" step="1" placeholder="300" value="${escapeHtml(data.count || '')}">
-            </div>
-            <div>
-                <label>Ед. изм.</label>
-                <input class="ingredient-unit" type="text" placeholder="г" value="${escapeHtml(data.unit || '')}">
-            </div>
-            <button type="button" class="danger-small" onclick="this.closest('.ingredient-row').remove()">×</button>
-        `;
-        list.appendChild(row);
-    }
-
-    function addStepRow(data = {}) {
-        const list = document.getElementById('stepsList');
-        const order = data.stepOrder || list.children.length + 1;
-        const row = document.createElement('div');
-        row.className = 'step-row';
-        row.innerHTML = `
-            <div>
-                <label>№</label>
-                <input class="step-order" type="number" min="1" step="1" value="${escapeHtml(order)}">
-            </div>
-            <div>
-                <label>Описание шага</label>
-                <textarea class="step-description" placeholder="Опишите действие">${escapeHtml(data.stepDescription || '')}</textarea>
-            </div>
-            <button type="button" class="danger-small" onclick="this.closest('.step-row').remove()">×</button>
-        `;
-        list.appendChild(row);
-    }
-
-    function collectIngredients() {
-        return Array.from(document.querySelectorAll('.ingredient-row'))
-            .map(row => ({
-                name: row.querySelector('.ingredient-name').value.trim(),
-                count: Number(row.querySelector('.ingredient-count').value),
-                unit: row.querySelector('.ingredient-unit').value.trim()
-            }))
-            .filter(item => item.name || item.count || item.unit);
-    }
-
-    function collectSteps() {
-        return Array.from(document.querySelectorAll('.step-row'))
-            .map((row, index) => ({
-                stepDescription: row.querySelector('.step-description').value.trim(),
-                stepOrder: Number(row.querySelector('.step-order').value) || index + 1
-            }))
-            .filter(item => item.stepDescription);
-    }
-
-    function validateForm(title, description, ingredients, steps) {
-        const errors = [];
-
-        if (!title) errors.push('Заполни название рецепта.');
-        if (!description) errors.push('Заполни краткое описание.');
-
-        ingredients.forEach((item, index) => {
-            if (!item.name) errors.push(`Ингредиент ${index + 1}: не заполнено название.`);
-            if (!item.count || item.count <= 0) errors.push(`Ингредиент ${index + 1}: количество должно быть больше 0.`);
-            if (!item.unit) errors.push(`Ингредиент ${index + 1}: не заполнена единица измерения.`);
-        });
-
-        steps.forEach((item, index) => {
-            if (!item.stepOrder || item.stepOrder <= 0) errors.push(`Шаг ${index + 1}: номер шага должен быть больше 0.`);
-            if (!item.stepDescription) errors.push(`Шаг ${index + 1}: не заполнено описание.`);
-        });
-
-        return errors;
-    }
-
-    async function postJson(url, data) {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Ошибка ${response.status}: ${errorText}`);
-        }
-
-        return await response.json();
-    }
-
-    async function saveIngredient(recipeId, ingredient) {
-        return await postJson(`${API}/${recipeId}/ingredient`, {
-            name: ingredient.name,
-            count: ingredient.count,
-            unit: ingredient.unit
-        });
-    }
-
-    async function saveStep(recipeId, step) {
-        return await postJson(`${API}/${recipeId}/step`, {
-            stepDescription: step.stepDescription,
-            stepOrder: step.stepOrder
-        });
-    }
-
-    function parseInternetMeasure(measure) {
-        const text = String(measure || '').trim();
-
-        if (!text) {
-            return { count: 1, unit: 'шт' };
-        }
-
-        const match = text.match(/^(\d+)\s*(.*)$/);
-        if (match) {
-            return {
-                count: Number(match[1]) || 1,
-                unit: match[2].trim() || 'шт'
-            };
-        }
-
-        // В TheMealDB часто приходит "1/2 tsp", "To taste", "A pinch".
-        // Backend ждет Int, поэтому оставляем count = 1, а исходную меру кладем в unit.
-        return {
-            count: 1,
-            unit: text
-        };
-    }
-
-    function splitInternetSteps(text) {
-        const clean = String(text || '')
-            .replace(/\r/g, '')
-            .replace(/\n+/g, '\n')
-            .trim();
-
-        if (!clean) return [];
-
-        const byLines = clean
-            .split('\n')
-            .map(s => s.trim())
-            .filter(Boolean);
-
-        if (byLines.length > 1) {
-            return byLines.map((line, index) => ({
-                stepOrder: index + 1,
-                stepDescription: line
-            }));
-        }
-
-        return clean
-            .split(/(?<=[.!?])\s+/)
-            .map(s => s.trim())
-            .filter(s => s.length > 10)
-            .slice(0, 20)
-            .map((sentence, index) => ({
-                stepOrder: index + 1,
-                stepDescription: sentence
-            }));
-    }
-
-    function fillFromInternetSearch() {
-        const raw = localStorage.getItem('importedRecipe');
-        if (!raw) {
-            addIngredientRow();
-            addStepRow();
-            return;
-        }
-
-        try {
-            const recipe = JSON.parse(raw);
-
-            document.getElementById('title').value = recipe.title || '';
-            document.getElementById('description').value = recipe.description || recipe.instructions || '';
-            document.getElementById('photoUrl').value = recipe.photoUrl || '';
-
-            const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
-            if (ingredients.length > 0) {
-                ingredients.forEach(item => {
-                    const parsed = parseInternetMeasure(item.measure);
-                    addIngredientRow({
-                        name: item.name || '',
-                        count: parsed.count,
-                        unit: parsed.unit
-                    });
-                });
-            } else {
-                addIngredientRow();
-            }
-
-            const steps = Array.isArray(recipe.steps) && recipe.steps.length > 0
-                ? recipe.steps
-                : splitInternetSteps(recipe.instructions || recipe.description || '');
-
-            if (steps.length > 0) {
-                steps.forEach(step => addStepRow(step));
-            } else {
-                addStepRow();
-            }
-
-            showMessage('Рецепт из интернета подставлен. Проверь ингредиенты и шаги, затем сохрани.', 'info');
-        } catch (error) {
-            localStorage.removeItem('importedRecipe');
-            addIngredientRow();
-            addStepRow();
-        }
-    }
-
-    function clearForm() {
-        document.getElementById('recipeForm').reset();
-        document.getElementById('ingredientsList').innerHTML = '';
-        document.getElementById('stepsList').innerHTML = '';
-        localStorage.removeItem('importedRecipe');
-        addIngredientRow();
-        addStepRow();
-        showMessage('Форма очищена.', 'info');
-    }
-
-    document.getElementById('recipeForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
+    document.getElementById('recipeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
         const title = document.getElementById('title').value.trim();
         const description = document.getElementById('description').value.trim();
-        const photoUrl = document.getElementById('photoUrl').value.trim();
+        const photoUrl = document.getElementById('photoUrl').value.trim() || null;
 
-        const ingredients = collectIngredients();
-        const steps = collectSteps();
-
-        const errors = validateForm(title, description, ingredients, steps);
-        if (errors.length > 0) {
-            showMessage(errors.join(' '), 'error');
+        if (!title || !description) {
+            showMessage('Заполните все обязательные поля!', true);
             return;
         }
 
-        showMessage('Сохраняю рецепт, ингредиенты и шаги...', 'info');
+        showMessage('Сохранение...');
 
         try {
-            const recipe = await postJson(`${API}/recipe`, {
-                title,
-                description,
-                photoUrl
+            const res = await fetch(`${API}/recipe`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description, photoUrl })
             });
 
-            const recipeId = recipe.idRecipe;
-
-            for (const ingredient of ingredients) {
-                await saveIngredient(recipeId, ingredient);
+            if (!res.ok) {
+                const err = await res.text();
+                throw new Error(`Ошибка сервера: ${res.status} — ${err}`);
             }
 
-            for (const step of steps) {
-                await saveStep(recipeId, step);
-            }
+            const recipe = await res.json();
+            showMessage(`Рецепт "${title}" успешно создан! ID: ${recipe.idRecipe}`, false);
 
-            localStorage.removeItem('importedRecipe');
-            showMessage(`Рецепт полностью сохранен. ID: ${recipeId}`, 'success');
-            setTimeout(() => window.location.href = `recipe.html?id=${recipeId}`, 900);
-        } catch (error) {
-            showMessage(`Не удалось сохранить: ${error.message}`, 'error');
+            setTimeout(() => window.location.href = 'index.html', 2000);
+        } catch (err) {
+            console.error(err);
+            showMessage(`Ошибка: ${err.message}`, true);
         }
     });
 
-    window.onload = fillFromInternetSearch;
+    function showMessage(text, isError = false) {
+        const msg = document.getElementById('message');
+        msg.innerHTML = `<div class="${isError ? 'error-msg' : 'success'}">${text}</div>`;
+    }
 </script>
 </body>
 </html>
